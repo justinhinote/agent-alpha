@@ -36,6 +36,7 @@ function buildHelpText(): string {
     "Examples:",
     "  agent-alpha init my-new-cli",
     "  agent-alpha generate command sync-reports --path my-new-cli",
+    "  agent-alpha snapshot-report --format both",
     "  agent-alpha metrics snapshot --format both"
   ].join("\n");
 }

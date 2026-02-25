@@ -76,3 +76,26 @@
 - `corepack pnpm start -- --help`: pass
 - `corepack pnpm start -- metrics --help`: pass
 - `corepack pnpm start -- metrics snapshot --format both`: pass
+
+## BRD Follow-up: Snapshot Report v0
+
+- [x] Add canonical `snapshot-report` top-level command.
+- [x] Build shared reporting engine under `src/lib/snapshot-report/`.
+- [x] Add optional GitHub enrichment with local-first fallback.
+- [x] Refactor `metrics snapshot` into compatibility alias with deprecation notice.
+- [x] Add parser + KPI unit tests and expanded CLI integration tests.
+- [x] Update docs for v0 KPI contract and deferred setup-hours-saved metric.
+- [x] Re-run full local validation matrix and runtime check.
+
+## BRD Follow-up: Snapshot Report v0 Results
+
+- `corepack pnpm format:check`: pass
+- `corepack pnpm lint`: pass
+- `corepack pnpm typecheck`: pass
+- `corepack pnpm test`: pass (29/29 tests)
+- `corepack pnpm build`: pass
+- `corepack pnpm start -- --help`: pass
+- `corepack pnpm start -- snapshot-report --help`: pass
+- `corepack pnpm start -- snapshot-report --format both --path tmp-snapshot`: pass
+- `corepack pnpm start -- metrics snapshot --format json --path tmp-snapshot-alias`: pass
+- Performance gate: `snapshot-report` completed in ~2s on this repo (<60s target)

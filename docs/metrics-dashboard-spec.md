@@ -32,6 +32,7 @@ Track whether the CLI starter kit is delivering business value, not just technic
 - Formula: `baseline_setup_hours - actual_setup_hours`
 - Unit: hours
 - Goal: reduce setup time by over 80%
+- v0 command status: deferred in `snapshot-report` output until baseline onboarding is implemented
 
 ### 4. Defect Rate (Early Quality)
 
@@ -91,5 +92,8 @@ Track whether the CLI starter kit is delivering business value, not just technic
 ## Implementation Notes
 
 - Start with GitHub-native extraction scripts and markdown reports in `docs/reports/`.
+- Canonical command is `agent-alpha snapshot-report`; `metrics snapshot` is a compatibility alias.
+- v0 emitted KPI fields include: time-to-first-feature, CI pass rate before merge, and merge friction.
+- `setup-hours-saved` is intentionally omitted in v0 report artifacts.
 - Add automated metric snapshots after each merge into `main`.
 - Keep formulas stable for at least one quarter before changing definitions.

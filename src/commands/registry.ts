@@ -2,6 +2,7 @@ import type { CliResult } from "../types/cli";
 import { runGenerateCommand } from "./generate-command";
 import { runInitCommand } from "./init";
 import { runMetricsCommand } from "./metrics";
+import { runSnapshotReportCommand } from "./snapshot-report";
 // AUTO-GENERATED IMPORTS START
 // AUTO-GENERATED IMPORTS END
 
@@ -27,9 +28,17 @@ const builtInCommands: RegisteredCommand[] = [
   },
   {
     name: "metrics",
-    summary: "Emit KPI snapshot reports as markdown/json",
-    usage: "agent-alpha metrics snapshot [--path <target>] [--format markdown|json|both]",
+    summary: "Legacy alias for snapshot reports",
+    usage:
+      "agent-alpha metrics snapshot [--path <dir>] [--format markdown|json|both] [--window-days <n>] [--repo <owner/name>]",
     run: runMetricsCommand
+  },
+  {
+    name: "snapshot-report",
+    summary: "Generate executive-ready markdown/json KPI reports",
+    usage:
+      "agent-alpha snapshot-report [--path <dir>] [--format markdown|json|both] [--window-days <n>] [--repo <owner/name>]",
+    run: runSnapshotReportCommand
   }
 ];
 
