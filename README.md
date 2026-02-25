@@ -23,7 +23,8 @@ corepack pnpm start -- --help
 
 - `agent-alpha init [target-path] [--dry-run] [--force]`
 - `agent-alpha generate command <name> [--path <target>] [--dry-run] [--force]`
-- `agent-alpha metrics snapshot [--path <target>] [--format markdown|json|both]`
+- `agent-alpha snapshot-report [--path <dir>] [--format markdown|json|both] [--window-days <n>] [--repo <owner/name>]`
+- `agent-alpha metrics snapshot ...` (legacy alias)
 - `agent-alpha --help`
 - `agent-alpha --version`
 
@@ -36,7 +37,10 @@ corepack pnpm start -- init my-new-cli
 # Generate a command skeleton inside a project
 corepack pnpm start -- generate command sync-reports --path my-new-cli
 
-# Emit KPI snapshots to docs/reports/
+# Emit KPI snapshots to docs/reports/ (canonical)
+corepack pnpm start -- snapshot-report --format both
+
+# Legacy alias (still supported)
 corepack pnpm start -- metrics snapshot --format both
 ```
 
@@ -56,7 +60,8 @@ corepack pnpm start -- metrics snapshot --format both
 
 - `init` generates a deterministic starter baseline.
 - `generate command` scaffolds command + test skeleton files and auto-updates the command registry.
-- `metrics snapshot` emits KPI reports in markdown/json for executive and operator review.
+- `snapshot-report` is the production KPI reporting command (markdown/json output).
+- `metrics snapshot` remains as a compatibility alias with deprecation messaging.
 - Unknown commands return a non-zero exit code with actionable guidance.
 
 ## Supporting Docs

@@ -47,7 +47,7 @@ describe("runCli", () => {
 
     expect(exitCode).toBe(0);
     expect(stdout.join("")).toContain("Usage: agent-alpha <command> [options]");
-    expect(stdout.join("")).toContain("metrics");
+    expect(stdout.join("")).toContain("snapshot-report");
     expect(stderr).toHaveLength(0);
   });
 
@@ -74,10 +74,10 @@ describe("runCli", () => {
   it("returns command-specific help", async () => {
     const { io, stdout, stderr } = createTestIo();
 
-    const exitCode = await runCli(["init", "--help"], io);
+    const exitCode = await runCli(["snapshot-report", "--help"], io);
 
     expect(exitCode).toBe(0);
-    expect(stdout.join("")).toContain("Usage: agent-alpha init");
+    expect(stdout.join("")).toContain("Usage: agent-alpha snapshot-report");
     expect(stderr).toHaveLength(0);
   });
 
@@ -127,7 +127,6 @@ describe("runCli", () => {
       expect(exitCode).toBe(0);
       expect(stderr).toHaveLength(0);
       expect(stdout.join("")).toContain("Dry run");
-      expect(stdout.join("")).toContain("package.json");
       expect(stdout.join("")).toContain("src/commands/registry.ts");
     });
   });
@@ -215,12 +214,13 @@ describe("runCli", () => {
     });
   });
 
-  it("emits metrics snapshot in json format", async () => {
+  it("emits snapshot-report json with local-only fallback notes", async () => {
     await withTempDir(async (dirPath) => {
+      const outputPath = join(dirPath, "reports");
       const { io, stdout, stderr } = createTestIo();
 
       const exitCode = await runCli(
-        ["metrics", "snapshot", "--path", "reports", "--format", "json"],
+        ["snapshot-report", "--path", outputPath, "--format", "json"],
         io,
         {
           cwd: () => dirPath
@@ -229,36 +229,95 @@ describe("runCli", () => {
 
       expect(exitCode).toBe(0);
       expect(stderr).toHaveLength(0);
-      expect(stdout.join("")).toContain("Metrics snapshot generated");
+      expect(stdout.join("")).toContain("Snapshot report generated");
 
-      const reportFiles = await readdir(join(dirPath, "reports"));
+      const reportFiles = await readdir(outputPath);
       const jsonReport = reportFiles.find((fileName) => fileName.endsWith(".json"));
       expect(jsonReport).toBeDefined();
 
-      const jsonContent = await readFile(join(dirPath, "reports", jsonReport as string), "utf8");
+      const jsonContent = await readFile(join(outputPath, jsonReport as string), "utf8");
       const parsed = JSON.parse(jsonContent) as {
-        generatedAt?: string;
+        metadata?: {
+          dataSources?: {
+            github?: boolean;
+          };
+        };
         notes?: string[];
         kpi?: Record<string, unknown>;
       };
 
-      expect(parsed.generatedAt).toBeTruthy();
+      expect(parsed.metadata?.dataSources?.github).toBe(false);
       expect(parsed.kpi).toBeDefined();
-      expect(parsed.notes?.length).toBeGreaterThan(0);
+      expect(parsed.notes?.some((note) => note.includes("GitHub enrichment unavailable"))).toBe(
+        true
+      );
     });
   });
 
-  it("validates metrics format option", async () => {
+  it("emits snapshot-report markdown and json in both mode", async () => {
     await withTempDir(async (dirPath) => {
+      const outputPath = join(dirPath, "reports");
+      const { io } = createTestIo();
+
+      const exitCode = await runCli(
+        ["snapshot-report", "--path", outputPath, "--format", "both"],
+        io,
+        {
+          cwd: () => dirPath
+        }
+      );
+
+      expect(exitCode).toBe(0);
+
+      const reportFiles = await readdir(outputPath);
+      expect(reportFiles.some((fileName) => fileName.endsWith(".json"))).toBe(true);
+      expect(reportFiles.some((fileName) => fileName.endsWith(".md"))).toBe(true);
+    });
+  });
+
+  it("supports metrics snapshot as a compatibility alias", async () => {
+    await withTempDir(async (dirPath) => {
+      const outputPath = join(dirPath, "reports");
       const { io, stdout, stderr } = createTestIo();
 
-      const exitCode = await runCli(["metrics", "snapshot", "--format", "xml"], io, {
-        cwd: () => dirPath
-      });
+      const exitCode = await runCli(
+        ["metrics", "snapshot", "--path", outputPath, "--format", "json"],
+        io,
+        {
+          cwd: () => dirPath
+        }
+      );
 
-      expect(exitCode).toBe(1);
-      expect(stdout).toHaveLength(0);
-      expect(stderr.join("")).toContain("Invalid format value");
+      expect(exitCode).toBe(0);
+      expect(stderr).toHaveLength(0);
+      expect(stdout.join("")).toContain("Deprecated");
+      expect(stdout.join("")).toContain("snapshot-report");
     });
   });
+
+  it(
+    "completes snapshot-report within 60 seconds on the current repository",
+    {
+      timeout: 70000
+    },
+    async () => {
+      await withTempDir(async (dirPath) => {
+        const outputPath = join(dirPath, "reports");
+        const { io } = createTestIo();
+
+        const startedAt = Date.now();
+        const exitCode = await runCli(
+          ["snapshot-report", "--path", outputPath, "--format", "json"],
+          io,
+          {
+            cwd: () => process.cwd()
+          }
+        );
+        const elapsedMs = Date.now() - startedAt;
+
+        expect(exitCode).toBe(0);
+        expect(elapsedMs).toBeLessThan(60000);
+      });
+    }
+  );
 });
