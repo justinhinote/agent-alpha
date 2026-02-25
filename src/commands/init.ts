@@ -111,7 +111,8 @@ function buildInitPlan(projectName: string, rootPath: string): FilePlanItem[] {
           build: "tsc -p tsconfig.json",
           typecheck: "tsc --noEmit -p tsconfig.json",
           test: "vitest run",
-          start: "node dist/cli.js"
+          start: "tsx src/cli.ts",
+          "start:dist": "node dist/cli.js"
         },
         packageManager: "pnpm@10.30.2",
         engines: {

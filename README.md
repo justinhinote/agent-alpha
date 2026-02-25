@@ -49,7 +49,8 @@ corepack pnpm start -- metrics snapshot --format both
 - `typecheck`: run TypeScript static checks without emitting files
 - `test`: execute CLI smoke tests
 - `build`: compile TypeScript into `dist/`
-- `start`: run compiled CLI binary
+- `start`: run CLI from TypeScript source (`tsx`) for immediate command availability
+- `start:dist`: run compiled CLI binary from `dist/`
 
 ## Initial CLI Contract
 
