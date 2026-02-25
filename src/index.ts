@@ -1,7 +1,8 @@
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 
-import type { CliIO, CliResult } from "./types/cli";
+import { commandRegistry, findCommand } from "./commands/registry";
+import type { CliIO, CliResult, CliRuntime } from "./types/cli";
 
 function readVersionFromPackageJson(): string {
   try {
@@ -16,22 +17,46 @@ function readVersionFromPackageJson(): string {
 }
 
 function buildHelpText(): string {
+  const commandLines = commandRegistry
+    .map((command) => `  ${command.name.padEnd(10)} ${command.summary}`)
+    .join("\n");
+
   return [
     "agent-alpha",
     "",
-    "Usage: agent-alpha [options]",
+    "Usage: agent-alpha <command> [options]",
     "",
-    "Options:",
+    "Global options:",
     "  -h, --help       Show help",
     "  -v, --version    Show version",
     "",
-    "Future command groups will be added here as the project evolves."
+    "Commands:",
+    commandLines,
+    "",
+    "Examples:",
+    "  agent-alpha init my-new-cli",
+    "  agent-alpha generate command sync-reports --path my-new-cli",
+    "  agent-alpha metrics snapshot --format both"
   ].join("\n");
 }
 
-function evaluateArgs(argv: string[], version: string): CliResult {
+function buildCommandHelp(commandName: string, usage: string): string {
+  return [
+    `Command: ${commandName}`,
+    "",
+    `Usage: ${usage}`,
+    "",
+    "Run `agent-alpha --help` to see all available commands."
+  ].join("\n");
+}
+
+async function evaluateArgs(
+  argv: string[],
+  version: string,
+  runtime: CliRuntime
+): Promise<CliResult> {
   const normalizedArgs = argv[0] === "--" ? argv.slice(1) : argv;
-  const [firstArg] = normalizedArgs;
+  const [firstArg, ...restArgs] = normalizedArgs;
 
   if (!firstArg || firstArg === "--help" || firstArg === "-h") {
     return {
@@ -49,11 +74,24 @@ function evaluateArgs(argv: string[], version: string): CliResult {
     };
   }
 
-  return {
-    exitCode: 1,
-    stream: "stderr",
-    message: `Unknown command: ${firstArg}\nRun "agent-alpha --help" for usage.`
-  };
+  const command = findCommand(firstArg);
+  if (!command) {
+    return {
+      exitCode: 1,
+      stream: "stderr",
+      message: `Unknown command: ${firstArg}\nRun "agent-alpha --help" for usage.`
+    };
+  }
+
+  if (restArgs[0] === "--help" || restArgs[0] === "-h") {
+    return {
+      exitCode: 0,
+      stream: "stdout",
+      message: buildCommandHelp(command.name, command.usage)
+    };
+  }
+
+  return command.run(restArgs, runtime.cwd());
 }
 
 const defaultIo: CliIO = {
@@ -66,13 +104,26 @@ const defaultIo: CliIO = {
   version: readVersionFromPackageJson()
 };
 
-export async function runCli(argv: string[], ioOverrides: Partial<CliIO> = {}): Promise<number> {
+const defaultRuntime: CliRuntime = {
+  cwd: () => process.cwd()
+};
+
+export async function runCli(
+  argv: string[],
+  ioOverrides: Partial<CliIO> = {},
+  runtimeOverrides: Partial<CliRuntime> = {}
+): Promise<number> {
   const io: CliIO = {
     ...defaultIo,
     ...ioOverrides
   };
 
-  const result = evaluateArgs(argv, io.version);
+  const runtime: CliRuntime = {
+    ...defaultRuntime,
+    ...runtimeOverrides
+  };
+
+  const result = await evaluateArgs(argv, io.version, runtime);
 
   if (result.message) {
     const line = result.message.endsWith("\n") ? result.message : `${result.message}\n`;

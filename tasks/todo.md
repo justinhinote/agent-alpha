@@ -34,3 +34,45 @@
 - [x] Add ESLint + Prettier tooling and scripts.
 - [x] Add CI workflow for lint/format/typecheck/test/build.
 - [x] Re-run validation matrix after tooling changes.
+
+## BRD Follow-up: Phase 0/1 + Strategy Docs
+
+- [x] Implement `init` command for deterministic starter generation.
+- [x] Implement `generate command` scaffolding command.
+- [x] Add filesystem-collision and dry-run safety.
+- [x] Expand tests for Phase 0/1 command flows.
+- [x] Add metrics dashboard specification document.
+- [x] Add non-technical executive one-pager.
+- [x] Re-run full local validation matrix.
+
+## BRD Follow-up: Review / Results
+
+- `corepack pnpm format:check`: pass
+- `corepack pnpm lint`: pass
+- `corepack pnpm typecheck`: pass
+- `corepack pnpm test`: pass (9/9 tests)
+- `corepack pnpm build`: pass
+- `corepack pnpm start -- --help`: pass
+- `corepack pnpm start -- init --help`: pass
+- `corepack pnpm start -- generate --help`: pass
+- `corepack pnpm start -- init sandbox --dry-run`: pass
+- `corepack pnpm start -- generate command sync-data --dry-run`: pass
+
+## BRD Follow-up: Registry + Metrics
+
+- [x] Add marker-based command registry for parser dispatch.
+- [x] Auto-update registry during `generate command`.
+- [x] Add `metrics snapshot` command for markdown/json KPI output.
+- [x] Expand tests for registry updates and metrics output.
+- [x] Re-run full validation matrix.
+
+## BRD Follow-up: Registry + Metrics Results
+
+- `corepack pnpm format:check`: pass
+- `corepack pnpm lint`: pass
+- `corepack pnpm typecheck`: pass
+- `corepack pnpm test`: pass (12/12 tests)
+- `corepack pnpm build`: pass
+- `corepack pnpm start -- --help`: pass
+- `corepack pnpm start -- metrics --help`: pass
+- `corepack pnpm start -- metrics snapshot --format both`: pass
