@@ -11,3 +11,7 @@ export interface CliIO {
   writeStderr: (text: string) => void;
   version: string;
 }
+
+export interface CliRuntime {
+  cwd: () => string;
+}
