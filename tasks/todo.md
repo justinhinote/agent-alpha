@@ -116,6 +116,7 @@
 - Added CI `snapshot_artifacts` job in `.github/workflows/ci.yml` (push `main` only, post-validate).
 - Added CI pre-step to restore prior snapshot artifacts from the previous successful `main` run.
 - Updated README and architecture/spec docs for trend and CI automation behavior.
+- Opened PR #5 after push to `main` was blocked by branch protection rules.
 
 ## Expansion Cycle: Review / Results
 
