@@ -10,6 +10,7 @@
   },
   "scripts": {
     "dev": "tsx src/cli.ts",
+    "demo:snapshot": "bash scripts/demo-snapshot-report.sh",
     "lint": "eslint .",
     "format": "prettier . --write",
     "format:check": "prettier . --check",
