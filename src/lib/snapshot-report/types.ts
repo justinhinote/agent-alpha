@@ -46,10 +46,35 @@ export interface SnapshotReportKpi {
   mergeFrictionMedianHours: number | null;
 }
 
+export type SnapshotDeltaDirection = "up" | "down" | "flat" | "na";
+
+export interface SnapshotNumericDelta {
+  previous: number | null;
+  current: number | null;
+  delta: number | null;
+  direction: SnapshotDeltaDirection;
+}
+
+export interface SnapshotReportTrend {
+  previousSnapshot: {
+    generatedAt: string;
+    filePath: string;
+  } | null;
+  deltas: {
+    timeToFirstFeatureHours: SnapshotNumericDelta;
+    ciPassRateBeforeMergePercent: SnapshotNumericDelta;
+    mergeFrictionMedianHours: SnapshotNumericDelta;
+    commitsInWindow: SnapshotNumericDelta;
+    commandFileCount: SnapshotNumericDelta;
+    testFileCount: SnapshotNumericDelta;
+  };
+}
+
 export interface SnapshotReport {
   metadata: SnapshotReportMetadata;
   signals: SnapshotReportSignals;
   kpi: SnapshotReportKpi;
+  trend: SnapshotReportTrend;
   notes: string[];
 }
 

@@ -99,3 +99,33 @@
 - `corepack pnpm start -- snapshot-report --format both --path tmp-snapshot`: pass
 - `corepack pnpm start -- metrics snapshot --format json --path tmp-snapshot-alias`: pass
 - Performance gate: `snapshot-report` completed in ~2s on this repo (<60s target)
+
+## Expansion Cycle: CI Snapshot Automation + Trend Deltas
+
+- [x] Finalize trend/delta engine and markdown/json output contract.
+- [x] Add tests for trend baseline and delta math.
+- [x] Add CI automation job to publish snapshot artifacts on pushes to `main`.
+- [x] Update docs for automation behavior and trend interpretation.
+- [x] Run full validation matrix and record results.
+
+## Expansion Cycle: Progress Notes
+
+- Added trend model types and trend collector module under `src/lib/snapshot-report/`.
+- Wired trend/delta output into snapshot-report rendering and command output.
+- Added unit and integration tests for prior-snapshot baseline behavior.
+- Added CI `snapshot_artifacts` job in `.github/workflows/ci.yml` (push `main` only, post-validate).
+- Added CI pre-step to restore prior snapshot artifacts from the previous successful `main` run.
+- Updated README and architecture/spec docs for trend and CI automation behavior.
+- Opened PR #5 after push to `main` was blocked by branch protection rules.
+
+## Expansion Cycle: Review / Results
+
+- `corepack pnpm format`: pass
+- `corepack pnpm lint`: pass
+- `corepack pnpm format:check`: pass
+- `corepack pnpm typecheck`: pass
+- `corepack pnpm test`: pass (32/32 tests)
+- `corepack pnpm build`: pass
+- `corepack pnpm start -- snapshot-report --format json --path tmp-snapshot-ci`: pass
+- `corepack pnpm start -- snapshot-report --format json --path tmp-snapshot-ci` (second run): pass, trend baseline populated
+- `corepack pnpm start -- metrics snapshot --format json --path tmp-snapshot-ci-alias`: pass
