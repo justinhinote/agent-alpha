@@ -34,7 +34,7 @@ corepack pnpm start -- --help
 corepack pnpm demo:snapshot
 ```
 
-This creates `.demo/snapshot-report/reports/`, runs `snapshot-report` twice, and prints file paths plus trend/delta summary so you can immediately inspect output.
+This creates `.demo/snapshot-report/reports/`, runs `snapshot-report` twice, prints file paths plus trend/delta summary, and auto-opens the latest markdown report. Use `bash scripts/demo-snapshot-report.sh --no-open` to skip auto-open.
 
 ### Command Examples
 
