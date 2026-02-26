@@ -2,7 +2,30 @@
 set -euo pipefail
 
 ROOT_DIR="$(cd "$(dirname "$0")/.." && pwd)"
-DEMO_DIR="${1:-$ROOT_DIR/.demo/snapshot-report}"
+DEMO_DIR="$ROOT_DIR/.demo/snapshot-report"
+AUTO_OPEN=1
+
+while [ "$#" -gt 0 ]; do
+  case "$1" in
+    --no-open)
+      AUTO_OPEN=0
+      shift
+      ;;
+    --path)
+      DEMO_DIR="${2:-}"
+      if [ -z "$DEMO_DIR" ]; then
+        echo "Missing value for --path" >&2
+        exit 1
+      fi
+      shift 2
+      ;;
+    *)
+      DEMO_DIR="$1"
+      shift
+      ;;
+  esac
+done
+
 REPORT_DIR="$DEMO_DIR/reports"
 
 mkdir -p "$REPORT_DIR"
@@ -36,4 +59,16 @@ echo "Open these files:"
 echo "- $LATEST_JSON"
 if [ -f "$LATEST_MD" ]; then
   echo "- $LATEST_MD"
+fi
+
+if [ "$AUTO_OPEN" -eq 1 ] && [ -f "$LATEST_MD" ]; then
+  if command -v open >/dev/null 2>&1; then
+    echo ""
+    echo "Opening $LATEST_MD ..."
+    open "$LATEST_MD" || true
+  elif command -v xdg-open >/dev/null 2>&1; then
+    echo ""
+    echo "Opening $LATEST_MD ..."
+    xdg-open "$LATEST_MD" >/dev/null 2>&1 || true
+  fi
 fi
