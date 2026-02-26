@@ -133,7 +133,8 @@ export async function runSnapshotReportCommand(args: string[], cwd: string): Pro
       message: [
         `Snapshot report generated in ${elapsedMs}ms.`,
         ...result.writtenFiles.map((path) => `- ${relative(cwd, path) || path}`),
-        `GitHub enrichment: ${result.report.metadata.dataSources.github ? "enabled" : "disabled"}`
+        `GitHub enrichment: ${result.report.metadata.dataSources.github ? "enabled" : "disabled"}`,
+        `Trend baseline: ${result.report.trend.previousSnapshot?.generatedAt ?? "none"}`
       ].join("\n")
     };
   } catch (error) {

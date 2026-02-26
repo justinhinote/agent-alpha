@@ -40,6 +40,9 @@ corepack pnpm start -- generate command sync-reports --path my-new-cli
 # Emit KPI snapshots to docs/reports/ (canonical)
 corepack pnpm start -- snapshot-report --format both
 
+# Re-run against the same output path to include trend/delta vs previous snapshot
+corepack pnpm start -- snapshot-report --format both --path docs/reports
+
 # Legacy alias (still supported)
 corepack pnpm start -- metrics snapshot --format both
 ```
@@ -61,8 +64,18 @@ corepack pnpm start -- metrics snapshot --format both
 - `init` generates a deterministic starter baseline.
 - `generate command` scaffolds command + test skeleton files and auto-updates the command registry.
 - `snapshot-report` is the production KPI reporting command (markdown/json output).
+- `snapshot-report` includes trend/delta values when a prior JSON snapshot exists in the output path.
 - `metrics snapshot` remains as a compatibility alias with deprecation messaging.
 - Unknown commands return a non-zero exit code with actionable guidance.
+
+## CI Snapshot Automation
+
+- GitHub Actions `CI` workflow runs validation on PRs and pushes.
+- On pushes to `main`, a follow-on `snapshot_artifacts` job runs:
+  - fetches the previous successful `main` run artifact (when available) to seed trend baseline data
+  - `pnpm start -- snapshot-report --path docs/reports --format both --repo <owner/name>`
+  - uploads generated `docs/reports/snapshot-report-*` files as a build artifact.
+- Local collection is always used; GitHub enrichment remains optional and does not block artifact generation.
 
 ## Supporting Docs
 

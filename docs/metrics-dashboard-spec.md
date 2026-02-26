@@ -65,6 +65,7 @@ Track whether the CLI starter kit is delivering business value, not just technic
 - Time to first feature (current and trend)
 - CI pass rate (current rolling 30-day)
 - Merge friction (median)
+- Snapshot-to-snapshot deltas (latest run versus prior run in same output path)
 - Milestone widget: first production command shipped
 
 ### Delivery View
@@ -95,5 +96,6 @@ Track whether the CLI starter kit is delivering business value, not just technic
 - Canonical command is `agent-alpha snapshot-report`; `metrics snapshot` is a compatibility alias.
 - v0 emitted KPI fields include: time-to-first-feature, CI pass rate before merge, and merge friction.
 - `setup-hours-saved` is intentionally omitted in v0 report artifacts.
-- Add automated metric snapshots after each merge into `main`.
+- CI automation mode is active: workflow job `snapshot_artifacts` runs on pushes to `main`, restores prior snapshot artifacts when available, and uploads new report artifacts.
+- `snapshot-report` computes trend/delta fields by comparing the latest run against the most recent prior JSON snapshot in the same output directory.
 - Keep formulas stable for at least one quarter before changing definitions.

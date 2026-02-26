@@ -275,6 +275,54 @@ describe("runCli", () => {
     });
   });
 
+  it("includes trend/delta data when a previous snapshot exists", async () => {
+    await withTempDir(async (dirPath) => {
+      const outputPath = join(dirPath, "reports");
+      const firstIo = createTestIo();
+      const secondIo = createTestIo();
+
+      const firstExitCode = await runCli(
+        ["snapshot-report", "--path", outputPath, "--format", "json"],
+        firstIo.io,
+        {
+          cwd: () => dirPath
+        }
+      );
+      expect(firstExitCode).toBe(0);
+
+      const secondExitCode = await runCli(
+        ["snapshot-report", "--path", outputPath, "--format", "json"],
+        secondIo.io,
+        {
+          cwd: () => dirPath
+        }
+      );
+      expect(secondExitCode).toBe(0);
+      expect(secondIo.stdout.join("")).toContain("Trend baseline:");
+
+      const reportFiles = (await readdir(outputPath))
+        .filter((name) => name.endsWith(".json"))
+        .sort((left, right) => right.localeCompare(left));
+
+      const latestReportContent = await readFile(join(outputPath, reportFiles[0]), "utf8");
+      const latestReport = JSON.parse(latestReportContent) as {
+        trend?: {
+          previousSnapshot?: {
+            generatedAt?: string;
+          } | null;
+          deltas?: {
+            commandFileCount?: {
+              direction?: string;
+            };
+          };
+        };
+      };
+
+      expect(latestReport.trend?.previousSnapshot?.generatedAt).toBeTruthy();
+      expect(latestReport.trend?.deltas?.commandFileCount?.direction).toBe("flat");
+    });
+  });
+
   it("supports metrics snapshot as a compatibility alias", async () => {
     await withTempDir(async (dirPath) => {
       const outputPath = join(dirPath, "reports");
