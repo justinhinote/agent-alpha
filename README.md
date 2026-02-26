@@ -28,6 +28,14 @@ corepack pnpm start -- --help
 - `agent-alpha --help`
 - `agent-alpha --version`
 
+## Live Demo Environment
+
+```bash
+corepack pnpm demo:snapshot
+```
+
+This creates `.demo/snapshot-report/reports/`, runs `snapshot-report` twice, and prints file paths plus trend/delta summary so you can immediately inspect output.
+
 ### Command Examples
 
 ```bash
